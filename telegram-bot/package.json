@@ -1,0 +1,20 @@
+{
+  "name": "unodrop-telegram-bot",
+  "version": "1.0.0",
+  "description": "Telegram bot for UnoDrop game",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js",
+    "dev": "nodemon bot.js"
+  },
+  "dependencies": {
+    "node-telegram-bot-api": "^0.64.0",
+    "pg": "^8.11.3",
+    "dotenv": "^16.3.1",
+    "axios": "^1.6.2",
+    "yookassa": "^3.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
