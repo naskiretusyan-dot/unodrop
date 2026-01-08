@@ -1,0 +1,10 @@
+{
+  "name": "unodrop-site",
+  "private": true,
+  "version": "1.0.0",
+  "type": "commonjs",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.7",
+    "axios": "^1.6.7"
+  }
+}

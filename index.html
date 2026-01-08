@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Апгрейд скинов</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="app-loading" class="app-loading">
+        <div class="app-loading__spinner"></div>
+        <div class="app-loading__text">Загрузка...</div>
+    </div>
+    <div id="drawer-backdrop" class="drawer-backdrop"></div>
+
+    <div id="case-overlay" class="case-overlay" style="display:none;">
+        <div class="case-modal" role="dialog" aria-modal="true">
+            <div class="case-title" id="case-title">Утешительный кейс</div>
+            <div class="case-subtitle" id="case-subtitle">Открываем...</div>
+
+            <div class="case-reel">
+                <div class="case-reel-window"></div>
+                <div id="case-reel-track" class="case-reel-track"></div>
+            </div>
+
+            <button id="case-claim" class="case-claim" style="display:none;">Забрать</button>
+        </div>
+    </div>
+
+    <!-- Right Drawer -->
+    <aside id="app-drawer" class="app-drawer" aria-hidden="true">
+        <div class="drawer-header">
+            <img id="drawer-avatar" class="drawer-avatar" src="" alt="" style="display:none;">
+            <div class="drawer-user">
+                <div id="drawer-name" class="drawer-name">Пользователь</div>
+                <div class="drawer-balance">Баланс: <span id="drawer-balance">0</span> ₽</div>
+            </div>
+            <button id="drawer-close" class="drawer-close" aria-label="Закрыть">×</button>
+        </div>
+
+        <div class="drawer-actions">
+            <button id="drawer-topup" class="drawer-btn">Пополнить</button>
+            <button id="drawer-about" class="drawer-btn">О нас</button>
+            <button id="drawer-rules" class="drawer-btn">Правила</button>
+            <button id="drawer-support" class="drawer-btn">Поддержка</button>
+            <button id="drawer-history" class="drawer-btn">История</button>
+            <button id="dev-deposit-btn" class="drawer-btn" style="display:none;">ТЕСТ ДЕПОЗИТ (СКИНЫ)</button>
+        </div>
+    </aside>
+
+    <canvas id="matrix"></canvas>
+    <div class="glow-effect" id="glow-effect"></div>
+    <div class="app-container">
+
+        <!-- Header -->
+        <header>
+            <div class="logo">
+                <img src="img/logo.png" alt="UnoDrop" class="logo-img">
+                <span class="logo-text">UnoDrop</span>
+            </div>
+            <div class="header-actions">
+                <img id="header-avatar" class="header-avatar" src="" alt="" style="display:none;">
+                <button id="burger-btn" class="burger-btn" aria-label="Меню">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Dashboard -->
+        <main id="main-page" class="dashboard page is-active">
+
+            <!-- TOP ROW: Active Play Area -->
+            <div class="top-row">
+
+                <!-- Left Slot (Bet) -->
+                <div class="slot-card" id="input-slot">
+                    <div class="slot-header">Ваша ставка</div>
+                    <div class="slot-content">
+
+                        <!-- Динамическая сетка для выбранных скинов -->
+                        <div id="selected-skins-grid" class="selected-skins-grid">
+                            <!-- Сюда будут добавляться выбранные скины и ячейка добавления -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Center Slot (Wheel) -->
+                <div class="wheel-panel">
+                    <div class="info-row">
+                        <div class="stat">
+                            <span class="label">Множитель</span>
+                            <span class="val">x<span id="display-multiplier">0.00</span></span>
+                        </div>
+
+                    </div>
+
+                    <div class="chance-selector">
+                        <div class="chance-buttons">
+                            <button class="chance-btn" data-chance="0.1">0.1%</button>
+                            <button class="chance-btn" data-chance="1">1%</button>
+                            <button class="chance-btn" data-chance="10">10%</button>
+                            <button class="chance-btn" data-chance="25">25%</button>
+                            <button class="chance-btn active" data-chance="50">50%</button>
+                            <button class="chance-btn" data-chance="75">75%</button>
+                        </div>
+                    </div>
+
+                    <div class="wheel-container">
+                        <canvas id="upgrade-wheel" width="300" height="300"></canvas>
+
+                        <!-- Новая стрелка сверху колеса -->
+                        <div class="wheel-pointer" id="wheel-pointer">
+                            <img src="img/qweq.png" alt="Указатель" class="pointer-arrow-img">
+                        </div>
+
+                        <!-- Кнопка-молния для быстрой прокрутки -->
+                        <button id="lightning-btn" class="lightning-btn" title="Быстрая прокрутка">
+                            <i class="fas fa-bolt"></i>
+                        </button>
+
+                        <div class="wheel-center-overlay">
+                            <div class="chance-display"><span id="win-chance">0.00</span>%</div>
+                            <div class="chance-label">Шанс выигрыша</div>
+                        </div>
+                    </div>
+
+                    <div class="controls">
+                        <button id="roll-button" class="roll-btn" disabled>ВЫБЕРИТЕ СКИНЫ</button>
+                    </div>
+                </div>
+
+                <!-- Right Slot (Target) -->
+                <div class="slot-card" id="target-slot">
+                    <div class="slot-header">Ваш выигрыш</div>
+                    <div class="slot-content">
+                        <div class="target-display">
+
+                            <img id="target-skin-img" src="" alt="" style="display:none;">
+                            <div class="slot-info">
+                                <div class="name" id="target-skin-name">Цель не выбрана</div>
+                                <div class="price"><span id="target-skin-price">0</span> ₽</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- BOTTOM ROW: Lists -->
+            <div class="bottom-row">
+
+                <!-- Equipment Panel -->
+                <div class="list-panel">
+                    <div class="panel-header">
+                        <span>Снаряжение</span>
+                        <div class="tab-buttons">
+                            <button class="tab-btn" data-tab="inventory">Инвентарь</button>
+                            <button class="tab-btn active" data-tab="market">Рынок</button>
+                        </div>
+                    </div>
+
+                    <!-- Inventory Tab -->
+                    <div class="tab-content" id="inventory-tab" style="display: none;">
+                        <div class="grid" id="inventory-grid">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Market Tab -->
+                    <div class="tab-content active" id="market-tab" style="display: block;">
+                        <div class="market-header">
+                            <h3>Рынок</h3>
+                            <div class="market-filters">
+                                <div class="filter-group">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" id="skin-search-market" placeholder="Поиск скинов...">
+                                </div>
+
+                                <div class="filter-group">
+                                    <i class="fas fa-coins"></i>
+                                    <input type="number" id="price-min" placeholder="Мин">
+                                </div>
+                                <span>-</span>
+                                <div class="filter-group">
+                                    <input type="number" id="price-max" placeholder="Макс">
+                                </div>
+                                <div class="filter-group">
+                                    <i class="fas fa-sort-amount-down"></i>
+                                    <select id="price-sort">
+                                        <option value="desc">Цена: по убыванию</option>
+                                        <option value="asc">Цена: по возрастанию</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid" id="market-grid">
+                            <!-- Market items will be loaded here -->
+                        </div>
+                        <div class="pagination-container" id="pagination-container">
+                            <!-- Pagination controls will be added here -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+
+        <!-- TopUp Page -->
+        <section id="topup-page" class="topup-page page">
+            <div class="topup-card">
+                <div class="topup-head">
+                    <button id="topup-back" class="topup-back">←</button>
+                    <div class="topup-title">Пополнение</div>
+                </div>
+
+                <div class="topup-balance">Ваш баланс: <span id="topup-balance">0</span> ₽</div>
+
+                <div class="topup-row">
+                    <label class="topup-label" for="topup-amount">Сумма (USDT)</label>
+                    <input id="topup-amount" class="topup-input" type="number" min="1" step="1" value="10" />
+                </div>
+
+                <div class="topup-presets">
+                    <button class="topup-preset" data-usdt="5">5</button>
+                    <button class="topup-preset" data-usdt="10">10</button>
+                    <button class="topup-preset" data-usdt="25">25</button>
+                    <button class="topup-preset" data-usdt="50">50</button>
+                </div>
+
+                <button id="topup-create" class="topup-cta">Создать счёт</button>
+                <div class="topup-hint">После оплаты вам будет начислено +5 скинов в инвентарь.</div>
+            </div>
+        </section>
+    </div>
+
+    <script src="skins_data.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
